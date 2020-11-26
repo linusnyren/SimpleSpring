@@ -24,5 +24,6 @@ public class Book {
     public Book(String author, String title, int releaseYear) {
         this.author = author;
         this.title = title;
+        this.releaseYear=releaseYear;
     }
 }

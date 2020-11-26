@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,9 +17,14 @@ public class BookShelf {
     private long id;
     private String category;
     private String aisle;
+
     @OneToMany(fetch = FetchType.LAZY)
     private List<Book> bookList;
 
-
-    //Here is all getters, but im using lombok thankfully
+    public BookShelf(String category, String aisle) {
+        this.category = category;
+        this.aisle = aisle;
+        this.bookList = new ArrayList<>();
+    }
+//Here is all getters, but im using lombok thankfully
 }
