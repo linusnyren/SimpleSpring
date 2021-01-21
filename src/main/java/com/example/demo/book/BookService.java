@@ -1,40 +1,40 @@
-package com.example.demo.Book;
+package com.example.demo.book;
 
 
-import com.example.demo.BookShelf.BookShelf;
-import com.example.demo.BookShelf.BookShelfRepository;
+import com.example.demo.bookShelf.BookShelf;
+import com.example.demo.bookShelf.BookShelfRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@RestController
+@Service
 public class BookService {
+
     @Autowired
     BookRepository bookRepository;
     @Autowired
     BookShelfRepository bookShelfRepository;
 
-    @PostMapping("/addBook/{bookShelfID}")
     public ResponseEntity<Book> addBook(@RequestBody Book book, @PathVariable int bookShelfID){
         bookRepository.save(book);
         BookShelf bookShelf = bookShelfRepository.findById(bookShelfID);
         bookShelf.getBookList().add(book);
         bookShelfRepository.save(bookShelf);
 
-        return new ResponseEntity<Book>(book, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(book, HttpStatus.ACCEPTED);
     }
-    @PutMapping("/changeBook")
     public ResponseEntity<Book> alterBook(@RequestBody Book book){
         Book bookDb = bookRepository.findById(book.getId());
         bookDb = book;
         bookRepository.save(bookDb);
-        return new ResponseEntity<Book>(bookDb, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(bookDb, HttpStatus.ACCEPTED);
     }
-    @GetMapping("/getAllBooks")
     public ResponseEntity<List<Book>> getAllBooks(){
-        return new ResponseEntity<List<Book>>(bookRepository.findAll(), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(bookRepository.findAll(), HttpStatus.ACCEPTED);
     }
 }
