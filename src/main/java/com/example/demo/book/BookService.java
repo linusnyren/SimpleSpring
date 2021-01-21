@@ -1,6 +1,7 @@
 package com.example.demo.book;
 
 
+import com.example.demo.bookShelf.BookAlreadyInListException;
 import com.example.demo.bookShelf.BookShelf;
 import com.example.demo.bookShelf.BookShelfRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +21,29 @@ public class BookService {
     @Autowired
     BookShelfRepository bookShelfRepository;
 
-    public ResponseEntity<Book> addBook(@RequestBody Book book, @PathVariable int bookShelfID){
+    public ResponseEntity<Book> addBook(@RequestBody Book book, @PathVariable int bookShelfID) {
         bookRepository.save(book);
         BookShelf bookShelf = bookShelfRepository.findById(bookShelfID);
-        bookShelf.getBookList().add(book);
-        bookShelfRepository.save(bookShelf);
+        try {
+            bookShelf.addBookToBookShelf(book);
+            bookShelfRepository.save(bookShelf);
+            return new ResponseEntity<>(book, HttpStatus.ACCEPTED);
+        } catch (BookAlreadyInListException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
-        return new ResponseEntity<>(book, HttpStatus.ACCEPTED);
     }
-    public ResponseEntity<Book> alterBook(@RequestBody Book book){
+    public ResponseEntity<Book> alterBook(@RequestBody Book book) {
         Book bookDb = bookRepository.findById(book.getId());
-        bookDb = book;
-        bookRepository.save(bookDb);
-        return new ResponseEntity<>(bookDb, HttpStatus.ACCEPTED);
+        if (bookDb != null) {
+            bookDb = book;
+            bookRepository.save(bookDb);
+            return new ResponseEntity<>(bookDb, HttpStatus.ACCEPTED);
+        } else {
+            return new ResponseEntity<Book>(HttpStatus.BAD_REQUEST);
+        }
+
     }
     public ResponseEntity<List<Book>> getAllBooks(){
         return new ResponseEntity<>(bookRepository.findAll(), HttpStatus.ACCEPTED);
